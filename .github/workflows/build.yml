@@ -43,15 +43,19 @@ jobs:
       - name: Set Python path for node-gyp (Windows)
         if: runner.os == 'Windows'
         run: |
-          echo "Using Python: $(which python)"
-          setx PYTHON "$(which python)"
+          echo "Using Python: $(where python)"
+          setx PYTHON "C:\\Path\\To\\Python3\\python.exe"
 
       - name: Upgrade node-gyp
         run: npm install -g node-gyp
 
       - name: Clean and install dependencies
         run: |
-          rm -rf node_modules package-lock.json
+          if ($env:RUNNER_OS -eq "Windows") {
+            Remove-Item -Recurse -Force node_modules, package-lock.json
+          } else {
+            rm -rf node_modules package-lock.json
+          }
           npm cache clean --force
           npm install --force
 
