@@ -28,8 +28,23 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Ensure Python 3 is used
-        run: npm config set python python3
+      - name: Ensure Python 3 is installed (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python-is-python3
+
+      - name: Set Python path for node-gyp (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: |
+          echo "Using Python: $(which python3)"
+          export PYTHON=$(which python3)
+
+      - name: Set Python path for node-gyp (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "Using Python: $(which python)"
+          setx PYTHON "$(which python)"
 
       - name: Upgrade node-gyp
         run: npm install -g node-gyp
